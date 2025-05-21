@@ -2,18 +2,28 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 )
 
+const webPort = "80"
+
+type Config struct{}
+
 func main() {
-	fmt.Println("inside main.go in the fire-service")
+	app := Config{}
 
-	http.HandleFunc("/hello", helloHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+	log.Printf("Starting fire service on port %s\n", webPort)
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "Hello Jonathan, this is your first go server - hitting the fire service`")
+	// define http server
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	// start the server
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
 }
